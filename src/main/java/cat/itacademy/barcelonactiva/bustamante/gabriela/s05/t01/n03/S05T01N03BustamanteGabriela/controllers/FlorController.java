@@ -24,24 +24,18 @@ public class FlorController {
 
     @PostMapping("/add")
     public Mono<FlorDTO> createFlor(@RequestBody Flor flor) {
-    return florServicio.crearFlor(flor)
-           .map(florServicio::convertToDto);
+        return florServicio.crearFlor(flor)
+                .map(florServicio::convertToDto);
     }
 
     @PutMapping("/update/{id}")
-   /*public Mono<ResponseEntity<Flor>> update(@PathVariable int id, @RequestBody Flor flor) {
-        return florServicio.updateFlor(id, flor.getNombreFlor(), flor.getPaisFlor())
-                .map(updateFlorDTO -> new ResponseEntity<>(updateFlorDTO, HttpStatus.OK));*/
-
     public Mono<ResponseEntity<String>> updateFlor(@PathVariable int id, @RequestBody Flor flor) {
         return florServicio.updateFlor(id, flor.getNombreFlor(), flor.getPaisFlor())
-                .map(updatedFlor -> {
-                    // Lógica ya realizada en convertToDTO para determinar el tipoFlor
-                    FlorDTO florDTO = florServicio.convertToDto(updatedFlor);
-                    return ResponseEntity.ok("Flor actualizada exitosamente, Tipo: " + florDTO.getTipoFlor());
-                })
-                .onErrorReturn(FlorNotFoundException.class, ResponseEntity.status(HttpStatus.NOT_FOUND).body("Flor no encontrada con el ID: " + id))
-                .onErrorReturn(RuntimeException.class, ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor"));
+                .map(mensaje -> ResponseEntity.ok(mensaje))
+                .onErrorResume(WebClientResponseException.NotFound.class, e ->
+                        Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Flor no encontrada con el ID: " + id)))
+                .onErrorResume(WebClientResponseException.class, e ->
+                        Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor")));
 
     }
 
@@ -54,16 +48,17 @@ public class FlorController {
 
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/getOne/{id}")
     public Mono<ResponseEntity<Flor>> getFlorById(@PathVariable("id") Integer id) {
 
         return florServicio.getFlorById(id)
                 .map(florDTO -> new ResponseEntity<>(florDTO, HttpStatus.OK))
                 .onErrorReturn(WebClientResponseException.NotFound.class, new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+
     @DeleteMapping("/delete/{id}")
     public Mono<ResponseEntity<Void>> deleteFlorById(@PathVariable("id") Integer id) {
-        return 	florServicio.deleteFlorById(id)
+        return florServicio.deleteFlorById(id)
                 .map(updateFlorDTO -> new ResponseEntity<Void>(HttpStatus.OK))
                 .onErrorReturn(WebClientResponseException.NotFound.class, new ResponseEntity<Void>(HttpStatus.NOT_FOUND));
     }

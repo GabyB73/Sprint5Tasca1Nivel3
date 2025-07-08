@@ -12,7 +12,7 @@ public interface FlorServicio {
     Mono<Flor> crearFlor(Flor flor);
     //Flor addFlor(Flor flor);
     Flux<FlorDTO> getAllFlor();
-    Mono<Flor> updateFlor(Integer pk_FlorID, String nombreFlor, String paisFlor);
+    Mono<String> updateFlor(Integer pk_FlorID, String nombreFlor, String paisFlor);
     Mono<Flor> getFlorById(int id);
     Mono<Void> deleteFlorById(int id);
     List<FlorDTO> convertToDtoList(List<Flor> flores);

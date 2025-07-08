@@ -12,7 +12,7 @@ public class WebClientConfig {
     WebClient webClient() {
 
         return WebClient.builder()
-                .baseUrl("http://localhost:9001/flores")
+                .baseUrl("http://localhost:9001/flor")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
     }

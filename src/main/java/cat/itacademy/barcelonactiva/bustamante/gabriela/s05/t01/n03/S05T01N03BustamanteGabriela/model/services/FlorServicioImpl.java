@@ -34,21 +34,27 @@ public class FlorServicioImpl implements FlorServicio{
 
     @Override
     public Mono<Flor> getFlorById(int id) {
-        return webClient.get().uri("/{id}", id)
+        return webClient
+                .get()
+                .uri("/getOne/{id}", id)
                 .retrieve()
                 .bodyToMono(Flor.class);
 
     }
 
     @Override
-    public Mono<Flor> updateFlor(Integer pk_FlorID, String nombreFlor, String paisFlor) {
-        return webClient.put()
+    public Mono<String> updateFlor(Integer pk_FlorID, String nombreFlor, String paisFlor) {
+        Flor flor = new Flor();
+        flor.setNombreFlor(nombreFlor);
+        flor.setPaisFlor(paisFlor);
+
+        return webClient
+                .put()
                 .uri("/update/{id}", pk_FlorID)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .body(Mono.just(Map.of("nombreFlor", nombreFlor, "paisFlor", paisFlor)), Map.class)
+                .bodyValue(flor) // <- aquí mando el objeto completo
                 .retrieve()
-                .bodyToMono(Flor.class);
-
+                .bodyToMono(String.class);
     }
 
         @Override
